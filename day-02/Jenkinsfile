@@ -8,12 +8,29 @@ pipeline {
             }
         }
 
-        stage('Verify') {
+        stage('Install Test Dependencies') {
             steps {
-                sh 'echo "ProductionOps CI/CD pipeline connected successfully"'
-                sh 'pwd'
-                sh 'ls -la'
+                sh '''
+                    python3 -m venv .venv-ci
+                    .venv-ci/bin/pip install --upgrade pip
+                    .venv-ci/bin/pip install -r day-01/requirements.txt
+                    .venv-ci/bin/pip install -r day-01/requirements-test.txt
+                '''
             }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                sh '''
+                    .venv-ci/bin/pytest -q day-01/test_app.py
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'rm -rf .venv-ci'
         }
     }
 }
