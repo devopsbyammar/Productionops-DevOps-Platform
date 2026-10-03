@@ -1,3 +1,4 @@
+```groovy
 pipeline {
     agent any
 
@@ -30,14 +31,17 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh """
-                        ${tool 'SonarScanner'}/bin/sonar-scanner \
-                          -Dsonar.projectKey=productionops \
-                          -Dsonar.projectName=ProductionOps \
-                          -Dsonar.sources=day-01 \
-                          -Dsonar.exclusions=day-01/.venv/**,day-01/__pycache__/** \
-                          -Dsonar.python.version=3.12
-                    """
+                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                            ${tool 'SonarScanner'}/bin/sonar-scanner \
+                              -Dsonar.projectKey=productionops \
+                              -Dsonar.projectName=ProductionOps \
+                              -Dsonar.sources=day-01 \
+                              -Dsonar.exclusions=day-01/.venv/**,day-01/__pycache__/** \
+                              -Dsonar.python.version=3.12 \
+                              -Dsonar.token=\$SONAR_TOKEN
+                        """
+                    }
                 }
             }
         }
@@ -49,3 +53,5 @@ pipeline {
         }
     }
 }
+```
+
