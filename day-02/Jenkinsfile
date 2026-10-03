@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        sonarQube 'SonarScanner'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -24,6 +28,21 @@ pipeline {
                 sh '''
                     .venv-ci/bin/pytest -q day-01/test_app.py
                 '''
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        sonar-scanner \
+                          -Dsonar.projectKey=productionops \
+                          -Dsonar.projectName=ProductionOps \
+                          -Dsonar.sources=day-01 \
+                          -Dsonar.exclusions=day-01/.venv/**,day-01/__pycache__/** \
+                          -Dsonar.python.version=3.12
+                    '''
+                }
             }
         }
     }
