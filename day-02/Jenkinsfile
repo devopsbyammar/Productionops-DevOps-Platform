@@ -30,14 +30,14 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        sonar-scanner \
+                    sh """
+                        ${tool 'SonarScanner'}/bin/sonar-scanner \
                           -Dsonar.projectKey=productionops \
                           -Dsonar.projectName=ProductionOps \
                           -Dsonar.sources=day-01 \
                           -Dsonar.exclusions=day-01/.venv/**,day-01/__pycache__/** \
                           -Dsonar.python.version=3.12
-                    '''
+                    """
                 }
             }
         }
