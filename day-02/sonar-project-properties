@@ -1,4 +1,4 @@
-sonar.projectKey=productionops
+sonar.projectKey=ProductionOps
 sonar.projectName=ProductionOps
 sonar.sources=day-01
 sonar.exclusions=day-01/.venv/**,day-01/__pycache__/**

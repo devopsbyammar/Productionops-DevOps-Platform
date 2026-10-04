@@ -64,7 +64,7 @@ pipeline {
                     )]) {
                         sh """
                             ${tool 'SonarScanner'}/bin/sonar-scanner \
-                              -Dsonar.projectKey=productionops \
+                              -Dsonar.projectKey=ProductionOps \
                               -Dsonar.projectName=ProductionOps \
                               -Dsonar.sources=day-01 \
                               -Dsonar.exclusions=day-01/.venv/**,day-01/__pycache__/** \
