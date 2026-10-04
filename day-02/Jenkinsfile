@@ -12,10 +12,14 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
                     sh '''
-                        RESPONSE=$(curl -s -u "$SONAR_TOKEN:" \
-                            http://10.210.168.28:9000/api/authentication/validate)
+                        echo "Token validation:"
+                        curl -s -u "$SONAR_TOKEN:" \
+                            http://10.210.168.28:9000/api/authentication/validate
 
-                        echo "$RESPONSE"
+                        echo
+                        echo "Authenticated user:"
+                        curl -s -u "$SONAR_TOKEN:" \
+                            http://10.210.168.28:9000/api/users/current    
                     '''
                 }
             }
