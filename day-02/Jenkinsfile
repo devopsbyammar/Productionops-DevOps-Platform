@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -6,6 +5,19 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Validate SonarQube Token') {
+            steps {
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                        RESPONSE=$(curl -s -u "$SONAR_TOKEN:" \
+                            http://10.210.168.28:9000/api/authentication/validate)
+
+                        echo "$RESPONSE"
+                    '''
+                }
             }
         }
 
@@ -53,4 +65,3 @@ pipeline {
         }
     }
 }
-
