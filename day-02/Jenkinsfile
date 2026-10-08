@@ -75,6 +75,18 @@ pipeline {
                 }
             }
         }
+
+        stage('Trivy Security Scan') {
+            steps {
+                sh '''
+                    echo "=== Trivy Security Scan ==="
+                    trivy image \
+                        --severity HIGH,CRITICAL \
+                        --exit-code 1 \
+                        production-app:1.0.0
+                '''
+            }
+        }
     }
 
     post {
@@ -83,3 +95,4 @@ pipeline {
         }
     }
 }
+
