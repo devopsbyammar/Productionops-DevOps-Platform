@@ -18,17 +18,17 @@ pipeline {
                     sh '''
                         echo "=== Token Validation ==="
                         curl -s -u "$SONAR_TOKEN:" \
-                            http://10.210.168.28:9000/api/authentication/validate
+                            http://127.0.0.1:9000/api/authentication/validate
 
                         echo
                         echo "=== Authenticated User ==="
                         curl -s -u "$SONAR_TOKEN:" \
-                            http://10.210.168.28:9000/api/users/current
+                            http://127.0.0.1:9000/api/users/current
 
                         echo
                         echo "=== ProductionOps Project Permissions ==="
                         curl -s -u "$SONAR_TOKEN:" \
-                            "http://10.210.168.28:9000/api/permissions/users?projectKey=productionops&q=admin"
+                            "http://127.0.0.1:9000/api/permissions/users?projectKey=productionops&q=admin"
 
                         echo
                     '''
