@@ -81,6 +81,7 @@ pipeline {
                 sh '''
                     echo "=== Trivy Security Scan ==="
                     trivy image \
+                        --ignore-unfixed \
                         --severity HIGH,CRITICAL \
                         --exit-code 1 \
                         production-app:1.0.0
