@@ -1,0 +1,49 @@
+
+---
+- name: Deploy ProductionOps application
+  hosts: local
+  gather_facts: false
+
+  vars:
+    app_image: "production-app:1.0.0"
+    app_container: "productionops-day5-app"
+    host_port: "5001"
+    container_port: "5000"
+
+  tasks:
+    - name: Check existing Day 5 container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - inspect
+          - --format
+          - "{{ '{{' }}.State.Status{{ '}}' }}"
+          - "{{ app_container }}"
+      register: container_status
+      changed_when: false
+      failed_when: false
+
+    - name: Create application container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - run
+          - --detach
+          - --name
+          - "{{ app_container }}"
+          - --publish
+          - "{{ host_port }}:{{ container_port }}"
+          - --restart
+          - unless-stopped
+          - "{{ app_image }}"
+      when: container_status.rc != 0
+
+    - name: Start existing stopped container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - start
+          - "{{ app_container }}"
+      when:
+        - container_status.rc == 0
+        - container_status.stdout != "running"

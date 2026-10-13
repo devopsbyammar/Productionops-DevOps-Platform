@@ -1,0 +1,14 @@
+
+---
+- name: Gather local system information
+  hosts: local
+  gather_facts: true
+
+  tasks:
+    - name: Display system hostname
+      ansible.builtin.debug:
+        msg: "Hostname: {{ ansible_hostname }}"
+
+    - name: Display operating system
+      ansible.builtin.debug:
+        msg: "Operating system: {{ ansible_distribution }} {{ ansible_distribution_version }}"

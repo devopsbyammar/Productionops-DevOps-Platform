@@ -1,0 +1,40 @@
+
+---
+- name: Verify ProductionOps application
+  hosts: local
+  gather_facts: false
+
+  vars:
+    app_container: "productionops-day5-app"
+    health_url: "http://127.0.0.1:5001/health"
+
+  tasks:
+    - name: Check container is running
+      ansible.builtin.command:
+        argv:
+          - docker
+          - inspect
+          - --format
+          - "{{ '{{' }}.State.Running{{ '}}' }}"
+          - "{{ app_container }}"
+      register: container_running
+      changed_when: false
+      failed_when: container_running.stdout != "true"
+
+    - name: Check application health endpoint
+      ansible.builtin.uri:
+        url: "{{ health_url }}"
+        method: GET
+        status_code: 200
+        return_content: true
+      register: health_response
+      retries: 5
+      delay: 3
+      until: health_response.status == 200
+
+    - name: Display verification result
+      ansible.builtin.debug:
+        msg:
+          - "Container is running: {{ app_container }}"
+          - "HTTP status: {{ health_response.status }}"
+          - "Health response: {{ health_response.json }}"

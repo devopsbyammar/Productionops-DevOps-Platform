@@ -1,0 +1,55 @@
+
+---
+- name: ProductionOps deployment preflight
+  hosts: local
+  gather_facts: true
+
+  vars:
+    app_dir: "{{ playbook_dir }}/../../../day-01"
+    app_image: "production-app:1.0.0"
+
+  tasks:
+    - name: Check application files
+      ansible.builtin.stat:
+        path: "{{ app_dir }}/{{ item }}"
+      loop:
+        - Dockerfile
+        - app.py
+        - requirements.txt
+      register: app_files
+
+    - name: Verify required files exist
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.isreg
+        fail_msg: "Required application file is missing: {{ item.item }}"
+        success_msg: "Application file exists: {{ item.item }}"
+      loop: "{{ app_files.results }}"
+
+    - name: Check Docker daemon
+      ansible.builtin.command:
+        argv:
+          - docker
+          - info
+          - --format
+          - "{{ '{{' }}.ServerVersion{{ '}}' }}"
+      changed_when: false
+      register: docker_version
+
+    - name: Verify application image exists
+      ansible.builtin.command:
+        argv:
+          - docker
+          - image
+          - inspect
+          - "{{ app_image }}"
+      changed_when: false
+      register: image_check
+
+    - name: Display preflight summary
+      ansible.builtin.debug:
+        msg:
+          - "Application directory: {{ app_dir }}"
+          - "Docker server version: {{ docker_version.stdout }}"
+          - "Image available: {{ app_image }}"
